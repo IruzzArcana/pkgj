@@ -785,7 +785,8 @@ void pkgi_do_main(Downloader& downloader, pkgi_input* input)
                                 io.AddKeyEvent(
                                         ImGuiKey_GamepadFaceDown,
                                         input.pressed & pkgi_ok_button());
-                                if (input.pressed & pkgi_cancel_button() || input.pressed & pkgi_ok_button())
+                                if (input.pressed & pkgi_cancel_button() ||
+                                    input.pressed & pkgi_ok_button())
                                     gameview->close();
 
                                 input.active = 0;
@@ -840,12 +841,16 @@ void pkgi_do_main(Downloader& downloader, pkgi_input* input)
         DbItem* item = db->get(selected_item);
         if (item->selected)
         {
-            items_list.erase(std::find_if(
-                    items_list.begin(),
-                    items_list.end(),
-                    [item](const DbItem& it) { return item->url == it.url; }));
+            items_list.erase(
+                    std::find_if(
+                            items_list.begin(),
+                            items_list.end(),
+                            [item](const DbItem& it)
+                            { return item->url == it.url; }));
         }
-        else if (items_list.size() < 32 - pkgi_list_dir_contents("ux0:bgdl/t").size())
+        else if (
+                items_list.size() <
+                32 - pkgi_list_dir_contents("ux0:bgdl/t").size())
         {
             items_list.push_back(*item);
         }
@@ -1037,9 +1042,8 @@ void pkgi_do_tail(Downloader& downloader)
         pkgi_snprintf(
                 text,
                 sizeof(text),
-                "Selected items: %d/%d",
-                items_list.size(),
-                32 - pkgi_list_dir_contents("ux0:bgdl/t").size());
+                "Selected items: %d",
+                items_list.size());
         pkgi_draw_text(
                 (VITA_WIDTH - pkgi_text_width(text)) / 2,
                 bottom_y,
@@ -1272,30 +1276,38 @@ void pkgi_start_download(Downloader& downloader, const DbItem& item)
                         item.name,
                         item.url,
                         std::vector<uint8_t>(rif, rif + PKGI_PSM_RIF_SIZE));
-                pkgi_dialog_message(
-                        fmt::format(
-                                "Installation of {} queued in LiveArea",
-                                item.name)
-                                .c_str());
+                if (items_list.empty())
+                    pkgi_dialog_message(
+                            fmt::format(
+                                    "Installation of {} queued in LiveArea",
+                                    item.name)
+                                    .c_str());
+                else
+                    pkgi_dialog_message(
+                            fmt::format(
+                                    "Installation of {} items queued in LiveArea",
+                                    items_list.size())
+                                    .c_str());
             }
             else
             {
-                downloader.add(DownloadItem{
-                        mode_to_type(mode),
-                        item.name,
-                        item.content,
-                        item.url,
-                        item.zrif.empty()
-                                ? std::vector<uint8_t>{}
-                                : std::vector<uint8_t>(
-                                          rif, rif + PKGI_PSM_RIF_SIZE),
-                        item.has_digest ? std::vector<uint8_t>(
-                                                  item.digest.begin(),
-                                                  item.digest.end())
-                                        : std::vector<uint8_t>{},
-                        !config.install_psp_as_pbp,
-                        pkgi_get_mode_partition(),
-                        ""});
+                downloader.add(
+                        DownloadItem{
+                                mode_to_type(mode),
+                                item.name,
+                                item.content,
+                                item.url,
+                                item.zrif.empty()
+                                        ? std::vector<uint8_t>{}
+                                        : std::vector<uint8_t>(
+                                                  rif, rif + PKGI_PSM_RIF_SIZE),
+                                item.has_digest ? std::vector<uint8_t>(
+                                                          item.digest.begin(),
+                                                          item.digest.end())
+                                                : std::vector<uint8_t>{},
+                                !config.install_psp_as_pbp,
+                                pkgi_get_mode_partition(),
+                                ""});
             }
         }
         else
