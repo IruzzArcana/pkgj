@@ -785,7 +785,7 @@ void pkgi_do_main(Downloader& downloader, pkgi_input* input)
                                 io.AddKeyEvent(
                                         ImGuiKey_GamepadFaceDown,
                                         input.pressed & pkgi_ok_button());
-                                if (input.pressed & pkgi_cancel_button())
+                                if (input.pressed & pkgi_cancel_button() || input.pressed & pkgi_ok_button())
                                     gameview->close();
 
                                 input.active = 0;
