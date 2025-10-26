@@ -1285,7 +1285,7 @@ void pkgi_start_download(Downloader& downloader, const DbItem& item)
                 else
                     pkgi_dialog_message(
                             fmt::format(
-                                    "Installation of {} items queued in LiveArea",
+                                    "Installation of {} item(s) queued in LiveArea",
                                     items_list.size())
                                     .c_str());
             }
